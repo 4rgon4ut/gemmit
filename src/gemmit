@@ -3,17 +3,28 @@
 # A wrapper for git commit to use gemmit.
 
 # Usage:
-# gemmit <template> [-y]
-# gemmit --add <template> [-y]
+# gemmit [-a|--add] <template> [-y]
+# gemmit [-h|--help]
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    echo "Usage: gemmit [-a|--add] <template> [-y]"
+    echo "       gemmit [-h|--help]"
+    echo ""
+    echo "Options:"
+    echo "  -a, --add    Stage all tracked files before committing."
+    echo "  -h, --help   Show this help message."
+    echo "  -y           Automatically use the generated commit message without confirmation."
+    exit 0
+fi
 
 ADD=false
-if [ "$1" == "--add" ]; then
+if [ "$1" == "-a" ] || [ "$1" == "--add" ]; then
     ADD=true
     shift
 fi
 
 if [ -z "$1" ]; then
-    echo "Usage: gemmit [--add] <template> [-y]"
+    echo "Usage: gemmit [-a|--add] <template> [-y]"
     exit 1
 fi
 
