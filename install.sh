@@ -8,7 +8,7 @@ CONFIG_FILE="$INSTALL_DIR/config.json"
 SCRIPT_FILE="$INSTALL_DIR/gemmit.py"
 GEMMIT_FILE="$INSTALL_DIR/gemmit"
 HOOK_FILE="$INSTALL_DIR/gemmit-hook"
-SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/gemmit"
+SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/src"
 
 # Create the installation directory if it doesn't exist.
 mkdir -p "$INSTALL_DIR"
