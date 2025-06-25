@@ -60,16 +60,11 @@ def main():
         print("--- Generated Commit Message ---")
         print(commit_message)
         print("--------------------------------")
-        try:
-            with open('/dev/tty') as tty:
-                tty.write("Use this commit message? [Y/n] ")
-                answer = tty.readline().strip()
-                if answer.lower() == 'n':
-                    print("Commit aborted by user.", file=sys.stderr)
-                    sys.exit(1)
-        except (IOError, OSError):
-            # If /dev/tty is not available, proceed with the commit
-            pass
+        sys.stdin = open('/dev/tty')
+        answer = input("Use this commit message? [Y/n] ")
+        if answer.lower() == 'n':
+            print("Commit aborted by user.", file=sys.stderr)
+            sys.exit(1)
 
     with open(commit_msg_filepath, 'w') as f:
         f.write(commit_message)
