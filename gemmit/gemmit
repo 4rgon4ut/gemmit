@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# A wrapper for git commit to use gemmit.
+
+# Usage:
+# gemmit <template> [-y]
+# gemmit --add <template> [-y]
+
+ADD=false
+if [ "$1" == "--add" ]; then
+    ADD=true
+    shift
+fi
+
+if [ -z "$1" ]; then
+    echo "Usage: gemmit [--add] <template> [-y]"
+    exit 1
+fi
+
+TEMPLATE=$1
+shift
+ARGS=$@
+
+if $ADD; then
+    echo "Adding all files..."
+    git add .
+fi
+
+echo "Generating commit message with template: $TEMPLATE"
+git commit -m "$TEMPLATE $ARGS"

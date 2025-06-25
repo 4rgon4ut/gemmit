@@ -1,44 +1,52 @@
-# gemmits
+# gemmit
 
-A simple tool to generate commit messages using the gemini-cli agent.
+A simple tool to generate commit messages using the gemini agent.
 
 ## Prerequisites
 
-*   You must have the `gemini-cli` agent installed and available in your system's `PATH`.
+*   You must have the `gemini` agent installed and available in your system's `PATH`.
 
 ## Installation
 
-To install gemmits, run the following command:
+To install gemmit, run the following command:
 
 ```bash
 ./install.sh
 ```
 
-This will install the tool in `~/.gemmits`.
+This will install the tool in `~/.gemmit`. You will also need to add `~/.gemmit` to your `PATH` by adding the following line to your shell profile (e.g., `~/.bashrc`, `~/.zshrc`):
+
+```bash
+export PATH="$HOME/.gemmit:$PATH"
+```
 
 ## Usage
 
-To use gemmits, you need to set it up as a git hook in your repository. Run the following command in your git repository:
+To use gemmit, you need to set it up as a git hook in your repository. Run the following command in your git repository:
 
 ```bash
-ln -s ~/.gemmits/gemmits.py .git/hooks/prepare-commit-msg
+ln -s ~/.gemmit/gemmit-hook .git/hooks/prepare-commit-msg
 ```
 
-Then, when you run `git commit`, you can specify a template like this:
+Then, you can use the `gemmit` command to generate commit messages:
 
 ```bash
-git commit -m "semantic"
+gemmit <template>
 ```
 
-This will generate a commit message using the `semantic` template. If you don't specify a template, it will default to `semantic`.
-
-After generating the message, the tool will ask for your confirmation before committing. To bypass this confirmation, you can either use the `-y` flag in your commit message:
+To add all files before committing, use the `--add` flag:
 
 ```bash
-git commit -m "semantic -y"
+gemmit --add <template>
 ```
 
-Or, you can set the `autoconfirm` option to `true` in your `~/.gemmits/config.json` file.
+After generating the message, the tool will ask for your confirmation before committing. To bypass this confirmation, you can either use the `-y` flag:
+
+```bash
+gemmit <template> -y
+```
+
+Or, you can set the `autoconfirm` option to `true` in your `~/.gemmit/config.json` file.
 
 ### Available Templates
 
@@ -47,4 +55,4 @@ Or, you can set the `autoconfirm` option to `true` in your `~/.gemmits/config.js
 
 ### Custom Templates
 
-You can add your own templates to `~/.gemmits/config.json`.
+You can add your own templates to `~/.gemmit/config.json`.

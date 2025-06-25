@@ -8,26 +8,26 @@ def get_git_diff():
     return subprocess.check_output(['git', 'diff', '--cached']).decode('utf-8')
 
 def generate_commit_message(template_name, diff):
-    config_path = os.path.expanduser('~/.gemmits/config.json')
+    config_path = os.path.expanduser('~/.gemmit/config.json')
     with open(config_path, 'r') as f:
         config = json.load(f)
 
     template = config['templates'][template_name]
     prompt = template['prompt'] + '\n\n' + diff
 
-    if not shutil.which('gemini-cli'):
-        print("Error: gemini-cli not found in PATH.", file=sys.stderr)
-        print("Please install the gemini-cli agent and ensure it is in your PATH.", file=sys.stderr)
+    if not shutil.which('gemini'):
+        print("Error: gemini not found in PATH.", file=sys.stderr)
+        print("Please install the gemini agent and ensure it is in your PATH.", file=sys.stderr)
         sys.exit(1)
 
     try:
-        commit_message = subprocess.check_output(['gemini-cli', prompt], text=True).strip()
+        commit_message = subprocess.check_output(['gemini', '-p', prompt], text=True).strip()
         return commit_message
     except subprocess.CalledProcessError as e:
-        print(f"Error calling gemini-cli: {e}", file=sys.stderr)
+        print(f"Error calling gemini: {e}", file=sys.stderr)
         sys.exit(1)
     except FileNotFoundError:
-        print("Error: 'gemini-cli' command not found. Make sure it is installed and in your PATH.", file=sys.stderr)
+        print("Error: 'gemini' command not found. Make sure it is installed and in your PATH.", file=sys.stderr)
         sys.exit(1)
 
 def main():
@@ -35,7 +35,7 @@ def main():
     template_name = 'semantic'  # Default template
 
     # Load config to check templates and autoconfirm
-    config_path = os.path.expanduser('~/.gemmits/config.json')
+    config_path = os.path.expanduser('~/.gemmit/config.json')
     with open(config_path, 'r') as f:
         config = json.load(f)
 
