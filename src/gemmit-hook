@@ -1,3 +1,0 @@
-#!/bin/sh
-# This hook is executed by git and runs the gemmit python script.
-exec python3 "$HOME/.gemmit/gemmit.py" "$@"

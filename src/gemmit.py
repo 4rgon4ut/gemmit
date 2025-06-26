@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import sys
 import json
@@ -31,43 +33,18 @@ def generate_commit_message(template_name, diff):
         sys.exit(1)
 
 def main():
-    commit_msg_filepath = sys.argv[1]
-    template_name = 'semantic'  # Default template
+    if len(sys.argv) < 2:
+        print("Usage: gemmit.py <template>", file=sys.stderr)
+        sys.exit(1)
 
-    # Load config to check templates and autoconfirm
-    config_path = os.path.expanduser('~/.gemmit/config.json')
-    with open(config_path, 'r') as f:
-        config = json.load(f)
-
-    autoconfirm = config.get('autoconfirm', False)
-
-    with open(commit_msg_filepath, 'r') as f:
-        first_line = f.readline().strip()
-        if first_line:
-            args = first_line.split()
-            if args and args[0] in config['templates']:
-                template_name = args[0]
-            if '-y' in args:
-                autoconfirm = True
-
+    template_name = sys.argv[1]
     diff = get_git_diff()
     if not diff:
+        print("No staged changes found.", file=sys.stderr)
         sys.exit(0)
 
     commit_message = generate_commit_message(template_name, diff)
-
-    if not autoconfirm:
-        print("--- Generated Commit Message ---")
-        print(commit_message)
-        print("--------------------------------")
-        sys.stdin = open('/dev/tty')
-        answer = input("Use this commit message? [Y/n] ")
-        if answer.lower() == 'n':
-            print("Commit aborted by user.", file=sys.stderr)
-            sys.exit(1)
-
-    with open(commit_msg_filepath, 'w') as f:
-        f.write(commit_message)
+    print(commit_message)
 
 if __name__ == '__main__':
     main()

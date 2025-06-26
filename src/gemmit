@@ -37,5 +37,22 @@ if $ADD; then
     git add .
 fi
 
-echo "Generating commit message with template: $TEMPLATE"
-git commit -m "$TEMPLATE $ARGS"
+COMMIT_MSG=$(~/.gemmit/gemmit.py $TEMPLATE)
+
+if [ -z "$COMMIT_MSG" ]; then
+    echo "Commit message generation failed. Aborting."
+    exit 1
+fi
+
+if [ "$1" != "-y" ]; then
+    echo "--- Generated Commit Message ---"
+    echo "$COMMIT_MSG"
+    echo "--------------------------------"
+    read -p "Use this commit message? [Y/n] " answer
+    if [[ "$answer" =~ ^[nN]$ ]]; then
+        echo "Commit aborted by user."
+        exit 1
+    fi
+fi
+
+git commit -m "$COMMIT_MSG"
