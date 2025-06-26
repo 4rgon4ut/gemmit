@@ -49,14 +49,14 @@ gemmit [options] <template>
 
 The default templates are:
 
-*   `semantic`: Generates a commit message in the [Conventional Commits](https://www.conventionalcommits.org/) format.
-*   `kernel`: Generates a commit message in the Linux kernel format.
+*   `oneline`: Generates a oneline commit message in the [Conventional Commits](https://www.conventionalcommits.org/) format.
+*   `kernel`: Generates a verbose commit message in the Linux Kernel format.
 
 ### Examples
 
-*   **Generate a semantic commit message:**
+*   **Generate a oneline commit message:**
     ```bash
-    gemmit semantic
+    gemmit oneline
     ```
 
 *   **Stage all files and generate a kernel commit message:**
