@@ -1,4 +1,4 @@
-# gemmit
+# gemmit [WIP]
 
 `gemmit` is a command-line tool that uses the [gemini-cli](https://github.com/google/gemini-cli) to generate Git commit messages from templates based on your staged changes.
 
