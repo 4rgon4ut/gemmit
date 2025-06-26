@@ -22,13 +22,6 @@
     export PATH="$HOME/.gemmit:$PATH"
     ```
 
-4.  **Set up the Git hook:**
-
-    In your Git repository, run the following command to set up the `prepare-commit-msg` hook:
-    ```bash
-    ln -s ~/.gemmit/gemmit-hook .git/hooks/prepare-commit-msg
-    ```
-
 ## Usage
 
 To generate a commit message, use the `gemmit` command:
