@@ -3,34 +3,46 @@
 # A wrapper for git commit to use gemmit.
 
 # Usage:
-# gemmit [-a|--add] <template> [-y]
+# gemmit [-a|--add] [-p|--push] [-y] <template>
 # gemmit [-h|--help]
 
-if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
-    echo "Usage: gemmit [-a|--add] <template> [-y]"
-    echo "       gemmit [-h|--help]"
-    echo ""
-    echo "Options:"
-    echo "  -a, --add    Stage all tracked files before committing."
-    echo "  -h, --help   Show this help message."
-    echo "  -y           Automatically use the generated commit message without confirmation."
-    exit 0
-fi
-
 ADD=false
-if [ "$1" == "-a" ] || [ "$1" == "--add" ]; then
-    ADD=true
-    shift
-fi
+PUSH=false
+CONFIRM=true
+TEMPLATE=""
 
-if [ -z "$1" ]; then
-    echo "Usage: gemmit [-a|--add] <template> [-y]"
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -a|--add) ADD=true; shift ;;
+        -p|--push) PUSH=true; shift ;;
+        -y) CONFIRM=false; shift ;;
+        -h|--help)
+            echo "Usage: gemmit [-a|--add] [-p|--push] [-y] <template>"
+            echo "       gemmit [-h|--help]"
+            echo ""
+            echo "Options:"
+            echo "  -a, --add    Stage all tracked files before committing."
+            echo "  -p, --push   Push changes to the remote repository after committing."
+            echo "  -h, --help   Show this help message."
+            echo "  -y           Automatically use the generated commit message without confirmation."
+            exit 0
+            ;;
+        *)
+            if [ -z "$TEMPLATE" ]; then
+                TEMPLATE=$1
+                shift
+            else
+                echo "Unknown option: $1"
+                exit 1
+            fi
+            ;;
+    esac
+done
+
+if [ -z "$TEMPLATE" ]; then
+    echo "Usage: gemmit [-a|--add] [-p|--push] [-y] <template>"
     exit 1
 fi
-
-TEMPLATE=$1
-shift
-ARGS=$@
 
 if $ADD; then
     echo "Adding all files..."
@@ -44,7 +56,7 @@ if [ -z "$COMMIT_MSG" ]; then
     exit 1
 fi
 
-if [ "$1" != "-y" ]; then
+if $CONFIRM; then
     echo "--- Generated Commit Message ---"
     echo "$COMMIT_MSG"
     echo "--------------------------------"
@@ -56,3 +68,8 @@ if [ "$1" != "-y" ]; then
 fi
 
 git commit -m "$COMMIT_MSG"
+
+if $PUSH; then
+    echo "Pushing changes..."
+    git push
+fi
