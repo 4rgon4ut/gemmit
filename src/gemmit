@@ -56,9 +56,31 @@ if [ -z "$COMMIT_MSG" ]; then
     exit 1
 fi
 
-if $CONFIRM; then
+# Read config
+if [ -f "$HOME/.gemmit/config.json" ]; then
+    CONFIG_JSON=$(cat "$HOME/.gemmit/config.json")
+    AUTOCONFIRM=$(echo "$CONFIG_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('autoconfirm', False))")
+    HIGHLIGHT_COLOR=$(echo "$CONFIG_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('highlight_color'))")
+else
+    AUTOCONFIRM=false
+    HIGHLIGHT_COLOR=""
+fi
+
+# Set color codes
+NC='\033[0m' # No Color
+if [[ $HIGHLIGHT_COLOR =~ ^#[0-9a-fA-F]{6}$ ]]; then
+    R=$(printf "%d" "0x${HIGHLIGHT_COLOR:1:2}")
+    G=$(printf "%d" "0x${HIGHLIGHT_COLOR:3:2}")
+    B=$(printf "%d" "0x${HIGHLIGHT_COLOR:5:2}")
+    COLOR="\033[38;2;${R};${G};${B}m"
+else
+    COLOR=""
+    NC=""
+fi
+
+if $CONFIRM && [ "$AUTOCONFIRM" != "True" ]; then
     echo "--- Generated Commit Message ---"
-    echo "$COMMIT_MSG"
+    echo -e "${COLOR}${COMMIT_MSG}${NC}"
     echo "--------------------------------"
     read -p "Use this commit message? [Y/n] " answer
     if [[ "$answer" =~ ^[nN]$ ]]; then
@@ -70,6 +92,7 @@ fi
 git commit -m "$COMMIT_MSG"
 
 if $PUSH; then
-    echo "Pushing changes..."
+    REMOTE=$(git remote)
+    echo -e "${COLOR}Pushing changes to $REMOTE${NC}"
     git push
 fi
