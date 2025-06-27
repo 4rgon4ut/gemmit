@@ -92,7 +92,13 @@ fi
 git commit -m "$COMMIT_MSG"
 
 if $PUSH; then
-    REMOTE=$(git remote)
-    echo -e "${COLOR}Pushing changes to $REMOTE${NC}"
+    REMOTE_NAME=$(git remote | head -n 1)
+    if [ -n "$REMOTE_NAME" ]; then
+        REMOTE_URL=$(git remote get-url "$REMOTE_NAME")
+        echo -e "${COLOR}Pushing changes to $REMOTE_URL${NC}"
+    else
+        # Fallback for cases where remote name can't be determined
+        echo -e "${COLOR}Pushing changes...${NC}"
+    fi
     git push
 fi
