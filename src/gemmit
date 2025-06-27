@@ -3,44 +3,60 @@
 # A wrapper for git commit to use gemmit.
 
 # Usage:
-# gemmit [-a|--add] [-p|--push] [-y] <template>
+# gemmit [-a|--add] [-p|--push] [-y] [--prompt <prompt>] <template>
 # gemmit [-h|--help]
 
 ADD=false
 PUSH=false
 CONFIRM=true
 TEMPLATE=""
+PROMPT=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -a|--add) ADD=true; shift ;;
         -p|--push) PUSH=true; shift ;;
         -y) CONFIRM=false; shift ;;
+        --prompt) 
+            if [[ -n "$2" ]]; then
+                PROMPT="$2"
+                shift 2
+            else
+                echo "Error: --prompt requires an argument." >&2
+                exit 1
+            fi
+            ;;
         -h|--help)
-            echo "Usage: gemmit [-a|--add] [-p|--push] [-y] <template>"
+            echo "Usage: gemmit [-a|--add] [-p|--push] [-y] [--prompt <prompt>] <template>"
             echo "       gemmit [-h|--help]"
             echo ""
             echo "Options:"
-            echo "  -a, --add    Stage all tracked files before committing."
-            echo "  -p, --push   Push changes to the remote repository after committing."
-            echo "  -h, --help   Show this help message."
-            echo "  -y           Automatically use the generated commit message without confirmation."
+            echo "  -a, --add      Stage all tracked files before committing."
+            echo "  -p, --push     Push changes to the remote repository after committing."
+            echo "  -h, --help     Show this help message."
+            echo "  -y             Automatically use the generated commit message without confirmation."
+            echo "  --prompt       Use a custom prompt instead of a template."
             exit 0
             ;;
         *)
-            if [ -z "$TEMPLATE" ]; then
+            if [ -z "$TEMPLATE" ] && [ -z "$PROMPT" ]; then
                 TEMPLATE=$1
                 shift
             else
-                echo "Unknown option: $1"
+                echo "Unknown option: $1" >&2
                 exit 1
             fi
             ;;
     esac
 done
 
-if [ -z "$TEMPLATE" ]; then
-    echo "Usage: gemmit [-a|--add] [-p|--push] [-y] <template>"
+if [ -z "$TEMPLATE" ] && [ -z "$PROMPT" ]; then
+    echo "Usage: gemmit [-a|--add] [-p|--push] [-y] [--prompt <prompt>] <template>" >&2
+    exit 1
+fi
+
+if [ -n "$TEMPLATE" ] && [ -n "$PROMPT" ]; then
+    echo "Error: You cannot provide both a template and a --prompt." >&2
     exit 1
 fi
 
@@ -49,14 +65,26 @@ if $ADD; then
     git add .
 fi
 
-COMMIT_MSG=$(~/.gemmit/gemmit.py $TEMPLATE)
+if [ -n "$PROMPT" ]; then
+    COMMIT_MSG=$(~/.gemmit/gemmit.py --prompt "$PROMPT")
+else
+    COMMIT_MSG=$(~/.gemmit/gemmit.py "$TEMPLATE")
+fi
 
 if [ -z "$COMMIT_MSG" ]; then
-    echo "Commit message generation failed. Aborting."
+    echo "Commit message generation failed. Aborting." >&2
     exit 1
 fi
 
-if $CONFIRM; then
+# Read autoconfirm from config
+if [ -f "$HOME/.gemmit/config.json" ]; then
+    AUTOCONFIRM=$(python3 -c "import json; print(json.load(open(os.path.expanduser('~/.gemmit/config.json'))).get('autoconfirm', False))")
+else 
+    AUTOCONFIRM=false
+fi
+
+
+if $CONFIRM && [ "$AUTOCONFIRM" != "True" ]; then
     echo "--- Generated Commit Message ---"
     echo "$COMMIT_MSG"
     echo "--------------------------------"
