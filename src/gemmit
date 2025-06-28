@@ -49,7 +49,7 @@ if $ADD; then
     git add .
 fi
 
-COMMIT_MSG=$(~/.gemmit/gemmit.py $TEMPLATE)
+COMMIT_MSG=$(python3 ~/.gemmit/gemmit.py $TEMPLATE)
 
 if [ -z "$COMMIT_MSG" ]; then
     echo "Commit message generation failed. Aborting."

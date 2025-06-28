@@ -18,6 +18,11 @@ cp "$SOURCE_DIR/config.json" "$CONFIG_FILE"
 cp "$SOURCE_DIR/gemmit.py" "$SCRIPT_FILE"
 cp "$SOURCE_DIR/gemmit" "$GEMMIT_FILE"
 
+# Copy the new directories
+cp -r "$SOURCE_DIR/commands" "$INSTALL_DIR/commands"
+cp -r "$SOURCE_DIR/core" "$INSTALL_DIR/core"
+cp -r "$SOURCE_DIR/utils" "$INSTALL_DIR/utils"
+
 
 # Make the scripts executable.
 chmod +x "$SCRIPT_FILE"
