@@ -14,6 +14,8 @@ def test_repo(tmp_path):
     
     # Initialize Git repo
     subprocess.run(["git", "init"], cwd=repo_path, check=True)
+    subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo_path, check=True)
+    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo_path, check=True)
     
     # Create a dummy file
     (repo_path / "test.txt").write_text("initial content")
