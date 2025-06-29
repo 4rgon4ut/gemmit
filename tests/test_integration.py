@@ -2,7 +2,6 @@
 import pytest
 import subprocess
 import os
-import shutil
 import json
 
 # --- Test Setup and Fixtures ---

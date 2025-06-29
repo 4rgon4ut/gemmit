@@ -1,6 +1,6 @@
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from commands import generate
 
 @patch('commands.generate.get_template')
