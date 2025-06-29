@@ -2,6 +2,7 @@
 import subprocess
 import shutil
 import time
+import sys
 from utils.errors import handle_error
 
 def generate_commit_message(prompt):

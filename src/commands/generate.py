@@ -9,6 +9,7 @@ def run(args):
     """Generates a commit message and adds it to the staging area."""
     if not args:
         handle_error("No template specified.", "Usage: gemmit add <template>")
+        return
 
     template_name = args[0]
     template = get_template(template_name)
