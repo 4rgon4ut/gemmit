@@ -1,6 +1,6 @@
-# gemmit [WIP]
+# gemmit
 
-`gemmit` is a command-line tool that uses the [gemini-cli](https://github.com/google/gemini-cli) to generate Git commit messages from templates based on your staged changes.
+A command-line tool that uses the `gemini` CLI to generate Git commit messages from your staged changes.
 
 ## Installation
 
@@ -17,69 +17,87 @@
 
 3.  **Update your shell profile:**
 
-    Add the following line to your shell profile (e.g., `~/.bashrc`, `~/.zshrc`):
+    Add the following line to your `~/.bashrc`, `~/.zshrc`, or other shell profile:
     ```bash
     export PATH="$HOME/.gemmit:$PATH"
     ```
 
 ## Usage
 
-To generate a commit message, use the `gemmit` command:
-
 ```bash
 gemmit [options] <template>
 ```
 
+### Interactive Mode
+
+By default, `gemmit` runs in an interactive mode that allows you to review, edit, or regenerate the commit message before committing.
+
+```
+--- Generated Commit Message ---
+feat: Add interactive editing to gemmit
+
+This commit introduces a new interactive mode to the gemmit tool.
+Users can now review, edit, or regenerate the AI-generated commit
+message before it is committed.
+--------------------------------
+Use this message? [Y]es, [E]dit, [R]egenerate, [N]o: 
+```
+
+*   **[Y]es:** Accepts the message and commits.
+*   **[E]dit:** Opens the message in your default text editor for manual changes.
+*   **[R]egenerate:** Generates a new message using the same template.
+*   **[N]o:** Aborts the commit.
+
+**Note:** The "Edit" feature relies on the `$EDITOR` environment variable. Make sure it is configured in your shell profile (e.g., `export EDITOR=vim`). If it's not set, it will default to `vim`.
+
 ### Options
 
-*   `-a`, `--add`: Stage all tracked files before committing.
+*   `-a`, `--add`: Stage all tracked files (`git add .`) before generating the message.
+*   `-p`, `--push`: Push changes to the remote repository after a successful commit.
+*   `-y`: (YOLO mode) Skip the interactive confirmation and commit directly.
 *   `-h`, `--help`: Show the help message.
-*   `-p`, `--push`: Push changes to the remote repository after committing.
-*   `-y`: Automatically use the generated commit message without confirmation.
-
-### Templates
-
-`gemmit` uses templates to generate commit messages. You can define your own templates in the `~/.gemmit/config.json` file.
-
-The default templates are:
-
-*   `oneline`: Generates a oneline commit message in the [Conventional Commits](https://www.conventionalcommits.org/) format.
-*   `kernel`: Generates a verbose commit message in the Linux Kernel format.
-
-### Configuration
-
-You can configure `gemmit` by editing the `~/.gemmit/config.json` file.
-
-#### Confirmation Prompt
-
-By default, `gemmit` will ask for confirmation before using a generated commit message. You can disable this by setting the `autoconfirm` option to `true` in the `config.json` file.
-
-```json
-{
-  "autoconfirm": true
-}
-```
-
-#### Highlight Color
-
-You can set a highlight color for the generated commit message and other output. This makes it easier to distinguish `gemmit`'s output.
-
-Set the `highlight_color` option in your `config.json` file to a 6-digit hexadecimal color code (e.g., `#FFA500` for orange). If this option is not set or is invalid, no colors will be used.
-
-```json
-{
-  "highlight_color": "#FFA500"
-}
-```
 
 ### Examples
 
-*   **Generate a oneline commit message:**
-    ```bash
-    gemmit oneline
-    ```
+**1. Basic Commit**
 
-*   **Stage all files and generate a kernel commit message:**
-    ```bash
-    gemmit -a kernel
-    ```
+Stage your files manually, then generate a commit message using the `kernel` template.
+
+```bash
+# Stage your changes
+git add src/gemmit.py
+
+# Generate the commit message
+gemmit kernel
+```
+
+**2. Stage, Commit, and Push**
+
+An end-to-end workflow: stage all files, generate and confirm the message, and push to the remote repository.
+
+```bash
+gemmit -a -p kernel
+```
+
+```
+Adding all files...
+--- Generated Commit Message ---
+feat(gemmit): Refactor core logic for scalability
+
+The core logic has been refactored to use a more modular
+and scalable architecture. This makes it easier to add new
+commands and maintain the existing codebase.
+--------------------------------
+Use this message? [Y]es, [E]dit, [R]egenerate, [N]o: y
+[main 1234567] feat(gemmit): Refactor core logic for scalability
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+Pushing changes to origin/main...
+```
+
+### Configuration
+
+You can customize templates and behavior by editing `~/.gemmit/config.json`.
+
+*   **`templates`**: Define your own templates with custom prompts.
+*   **`autoconfirm`**: Set to `true` to make the `-y` flag the default behavior.
+*   **`highlight_color`**: Set a hex color code (e.g., `#FFA500`) for `gemmit`'s output.

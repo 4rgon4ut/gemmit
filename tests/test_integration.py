@@ -107,7 +107,7 @@ with open(file_path, 'w') as f:
     os.chmod(gemmit_cmd, 0o755)
     
     # We pipe 'e' for edit into the script's stdin
-    p = subprocess.run([str(gemmit_cmd), "test"], cwd=test_repo, check=True, env=env, input="e\n", text=True)
+    subprocess.run([str(gemmit_cmd), "test"], cwd=test_repo, check=True, env=env, input="e\n", text=True)
     
     result = subprocess.run(["git", "log", "-1", "--pretty=%B"], cwd=test_repo, check=True, capture_output=True, text=True)
     assert "feat: Edited commit message" in result.stdout.strip()
