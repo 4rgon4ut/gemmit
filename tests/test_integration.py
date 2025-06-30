@@ -1,4 +1,3 @@
-
 import pytest
 import subprocess
 import os
@@ -34,7 +33,7 @@ def mock_gemmit_home(tmp_path):
     
     # Create a mock config.json
     config_data = {
-        "autoconfirm": True, # Set to true to avoid interactive prompts in tests
+        "autoconfirm": False, # Set to false to trigger interactive prompt
         "templates": {
             "test": {"prompt": "A test prompt"}
         }
@@ -47,7 +46,6 @@ def mock_gemmit_home(tmp_path):
     os.chmod(gemini_script_path, 0o755)
     
     # Symlink the real gemmit script into our mock home
-    # This allows us to run the real script but control its environment
     os.symlink(os.path.abspath("src/gemmit"), gemmit_home / "gemmit")
     os.symlink(os.path.abspath("src/gemmit.py"), gemmit_home / "gemmit.py")
     os.symlink(os.path.abspath("src/commands"), gemmit_home / "commands", target_is_directory=True)
@@ -57,33 +55,59 @@ def mock_gemmit_home(tmp_path):
     
     yield gemmit_home
 
-# --- Integration Test ---
+# --- Integration Tests ---
 
-def test_end_to_end_commit(test_repo, mock_gemmit_home):
-    """Tests the full, end-to-end workflow of the gemmit tool."""
-    # 1. Make a change to a file
-    (test_repo / "test.txt").write_text("new content")
-    
-    # 2. Stage the change
+def test_end_to_end_commit_autoconfirm(test_repo, mock_gemmit_home):
+    """Tests the full, end-to-end workflow with autoconfirm=true."""
+    # Set autoconfirm to true for this test
+    config_path = mock_gemmit_home / "config.json"
+    with open(config_path, "r+") as f:
+        data = json.load(f)
+        data["autoconfirm"] = True
+        f.seek(0)
+        json.dump(data, f)
+        f.truncate()
+
+    (test_repo / "test.txt").write_text("new content for autoconfirm")
     subprocess.run(["git", "add", "test.txt"], cwd=test_repo, check=True)
     
-    # 3. Run the gemmit command from our mock home
-    # We need to modify the PATH to ensure our mock gemini is used.
     env = os.environ.copy()
     env["PATH"] = str(mock_gemmit_home) + os.pathsep + env["PATH"]
-    env["HOME"] = str(mock_gemmit_home.parent) # Make sure it finds ~/.gemmit
+    env["HOME"] = str(mock_gemmit_home.parent)
 
     gemmit_cmd = mock_gemmit_home / "gemmit"
     os.chmod(gemmit_cmd, 0o755)
     subprocess.run([str(gemmit_cmd), "test"], cwd=test_repo, check=True, env=env)
     
-    # 4. Verify the commit was created with the mocked message
-    result = subprocess.run(
-        ["git", "log", "-1", "--pretty=%B"], 
-        cwd=test_repo, 
-        check=True, 
-        capture_output=True, 
-        text=True
-    )
-    
+    result = subprocess.run(["git", "log", "-1", "--pretty=%B"], cwd=test_repo, check=True, capture_output=True, text=True)
     assert "feat: Mocked commit message" in result.stdout.strip()
+
+def test_end_to_end_commit_edit(test_repo, mock_gemmit_home):
+    """Tests the interactive edit workflow."""
+    (test_repo / "test.txt").write_text("new content for edit test")
+    subprocess.run(["git", "add", "test.txt"], cwd=test_repo, check=True)
+    
+    env = os.environ.copy()
+    env["PATH"] = str(mock_gemmit_home) + os.pathsep + env["PATH"]
+    env["HOME"] = str(mock_gemmit_home.parent)
+    # Create a mock editor script
+    editor_script_path = mock_gemmit_home / "mock_editor.py"
+    editor_script_path.write_text("""
+import sys
+file_path = sys.argv[1]
+with open(file_path, 'r') as f:
+    content = f.read()
+content = content.replace('Mocked', 'Edited')
+with open(file_path, 'w') as f:
+    f.write(content)
+""")
+    env["EDITOR"] = f"python3 {editor_script_path}"
+
+    gemmit_cmd = mock_gemmit_home / "gemmit"
+    os.chmod(gemmit_cmd, 0o755)
+    
+    # We pipe 'e' for edit into the script's stdin
+    p = subprocess.run([str(gemmit_cmd), "test"], cwd=test_repo, check=True, env=env, input="e\n", text=True)
+    
+    result = subprocess.run(["git", "log", "-1", "--pretty=%B"], cwd=test_repo, check=True, capture_output=True, text=True)
+    assert "feat: Edited commit message" in result.stdout.strip()

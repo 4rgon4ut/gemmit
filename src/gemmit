@@ -78,16 +78,51 @@ else
     NC=""
 fi
 
+
+# --- Interactive Confirmation Loop ---
+
 if $CONFIRM && [ "$AUTOCONFIRM" != "True" ]; then
-    echo "--- Generated Commit Message ---"
-    echo -e "${COLOR}${COMMIT_MSG}${NC}"
-    echo "--------------------------------"
-    read -p "Use this commit message? [Y/n] " answer
-    if [[ "$answer" =~ ^[nN]$ ]]; then
-        echo "Commit aborted by user."
-        exit 1
-    fi
+    while true; do
+        echo "--- Generated Commit Message ---"
+        echo -e "${COLOR}${COMMIT_MSG}${NC}"
+        echo "--------------------------------"
+        read -p "Use this message? [Y]es, [E]dit, [R]egenerate, [N]o: " answer
+
+        case $answer in
+            [Yy]* )
+                break # Accept and exit loop
+                ;;
+            [Ee]* )
+                # Open message in editor
+                TMP_FILE=$(mktemp)
+                echo -n "$COMMIT_MSG" > "$TMP_FILE"
+                ${EDITOR:-vim} "$TMP_FILE"
+                COMMIT_MSG=$(cat "$TMP_FILE")
+                rm "$TMP_FILE"
+                break # Accept edited message and exit loop
+                ;;
+            [Rr]* )
+                # Regenerate message
+                echo "Regenerating commit message..."
+                COMMIT_MSG=$(python3 ~/.gemmit/gemmit.py $TEMPLATE)
+                if [ -z "$COMMIT_MSG" ]; then
+                    echo "Commit message generation failed. Aborting."
+                    exit 1
+                fi
+                ;;
+            [Nn]* )
+                echo "Commit aborted by user."
+                exit 1
+                ;;
+            * )
+                echo "Invalid input. Please enter Y, E, R, or N."
+                ;;
+        esac
+    done
 fi
+
+# --- End Interactive Loop ---
+
 
 git commit -m "$COMMIT_MSG"
 
