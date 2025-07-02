@@ -1,3 +1,4 @@
+# This module handles the interaction with the Gemini CLI.
 
 import subprocess
 import shutil
@@ -13,6 +14,7 @@ def generate_commit_message(prompt):
     max_retries = 5
     retry_delay = 1
 
+    # Retry on API quota errors (HTTP 429).
     for i in range(max_retries):
         try:
             process = subprocess.run(
@@ -35,8 +37,6 @@ def generate_commit_message(prompt):
             else:
                 handle_error("An unexpected error occurred while calling the Gemini CLI.", e.stderr)
         except FileNotFoundError:
-            # This is a fallback, as shutil.which should catch it first.
             handle_error("'gemini' command not found. Make sure it is installed and in your PATH.")
 
-    # This part should not be reached, but as a safeguard.
     handle_error("Failed to generate commit message after all retries.")

@@ -1,3 +1,4 @@
+# This module contains the logic for the `generate` command.
 
 import sys
 from core.ai import generate_commit_message
@@ -6,7 +7,7 @@ from core.git import get_staged_diff
 from utils.errors import handle_error
 
 def run(args):
-    """Generates a commit message and adds it to the staging area."""
+    """Generates a commit message and prints it to stdout."""
     if not args:
         handle_error("No template specified.", "Usage: gemmit add <template>")
         return
@@ -15,6 +16,7 @@ def run(args):
     template = get_template(template_name)
     diff = get_staged_diff()
 
+    # Exit gracefully if there are no staged changes.
     if not diff:
         print("No staged changes found.")
         sys.exit(0)
@@ -22,5 +24,6 @@ def run(args):
     prompt = template.get('prompt', '') + '\n\n' + diff
     commit_message = generate_commit_message(prompt)
 
-    # The commit message is printed to stdout, which the git hook will capture.
+    # Print the commit message to stdout for the calling script.
     print(commit_message)
+

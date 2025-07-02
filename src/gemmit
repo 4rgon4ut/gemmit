@@ -2,15 +2,11 @@
 
 # A wrapper for git commit to use gemmit.
 
-# Usage:
-# gemmit [-a|--add] [-p|--push] [-y] <template>
-# gemmit [-h|--help]
-
+# Parse command-line options.
 ADD=false
 PUSH=false
 CONFIRM=true
 TEMPLATE=""
-
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -a|--add) ADD=true; shift ;;
@@ -19,12 +15,6 @@ while [[ "$#" -gt 0 ]]; do
         -h|--help)
             echo "Usage: gemmit [-a|--add] [-p|--push] [-y] <template>"
             echo "       gemmit [-h|--help]"
-            echo ""
-            echo "Options:"
-            echo "  -a, --add    Stage all tracked files before committing."
-            echo "  -p, --push   Push changes to the remote repository after committing."
-            echo "  -h, --help   Show this help message."
-            echo "  -y           Automatically use the generated commit message without confirmation."
             exit 0
             ;;
         *)
@@ -44,19 +34,20 @@ if [ -z "$TEMPLATE" ]; then
     exit 1
 fi
 
+# Stage files if requested.
 if $ADD; then
     echo "Adding all files..."
     git add .
 fi
 
+# Generate the commit message.
 COMMIT_MSG=$(python3 ~/.gemmit/gemmit.py $TEMPLATE)
-
 if [ -z "$COMMIT_MSG" ]; then
     echo "Commit message generation failed. Aborting."
     exit 1
 fi
 
-# Read config
+# Load settings from config file.
 if [ -f "$HOME/.gemmit/config.json" ]; then
     CONFIG_JSON=$(cat "$HOME/.gemmit/config.json")
     AUTOCONFIRM=$(echo "$CONFIG_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('autoconfirm', False))")
@@ -66,7 +57,7 @@ else
     HIGHLIGHT_COLOR=""
 fi
 
-# Set color codes
+# Set highlight color for output.
 NC='\033[0m' # No Color
 if [[ $HIGHLIGHT_COLOR =~ ^#[0-9a-fA-F]{6}$ ]]; then
     R=$(printf "%d" "0x${HIGHLIGHT_COLOR:1:2}")
@@ -78,9 +69,7 @@ else
     NC=""
 fi
 
-
-# --- Interactive Confirmation Loop ---
-
+# If not in autoconfirm mode, show the interactive prompt.
 if $CONFIRM && [ "$AUTOCONFIRM" != "True" ]; then
     while true; do
         echo "--- Generated Commit Message ---"
@@ -90,19 +79,19 @@ if $CONFIRM && [ "$AUTOCONFIRM" != "True" ]; then
 
         case $answer in
             [Yy]* )
-                break # Accept and exit loop
+                break
                 ;;
             [Ee]* )
-                # Open message in editor
+                # Open message in the user's default editor.
                 TMP_FILE=$(mktemp)
                 echo -n "$COMMIT_MSG" > "$TMP_FILE"
-                ${EDITOR:-vim} "$TMP_FILE"
+                ${EDITOR:-vim} "$TMP_FILE" # Fallback to vim.
                 COMMIT_MSG=$(cat "$TMP_FILE")
                 rm "$TMP_FILE"
-                break # Accept edited message and exit loop
+                break
                 ;;
             [Rr]* )
-                # Regenerate message
+                # Get a new commit message.
                 echo "Regenerating commit message..."
                 COMMIT_MSG=$(python3 ~/.gemmit/gemmit.py $TEMPLATE)
                 if [ -z "$COMMIT_MSG" ]; then
@@ -121,18 +110,14 @@ if $CONFIRM && [ "$AUTOCONFIRM" != "True" ]; then
     done
 fi
 
-# --- End Interactive Loop ---
-
-
+# Commit and push if requested.
 git commit -m "$COMMIT_MSG"
-
 if $PUSH; then
     REMOTE_NAME=$(git remote | head -n 1)
     if [ -n "$REMOTE_NAME" ]; then
         REMOTE_URL=$(git remote get-url "$REMOTE_NAME")
         echo -e "${COLOR}Pushing changes to $REMOTE_URL${NC}"
     else
-        # Fallback for cases where remote name can't be determined
         echo -e "${COLOR}Pushing changes...${NC}"
     fi
     git push

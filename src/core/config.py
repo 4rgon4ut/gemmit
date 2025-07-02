@@ -1,3 +1,4 @@
+# This module manages the configuration for gemmit.
 
 import json
 import os
