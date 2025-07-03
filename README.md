@@ -52,10 +52,12 @@ Use this message? [Y]es, [E]dit, [R]egenerate, [N]o:
 
 ### Options
 
-*   `-a`, `--add`: Stage all tracked files (`git add .`) before generating the message.
-*   `-p`, `--push`: Push changes to the remote repository after a successful commit.
+Flags can be combined (e.g., `-apy`).
+
+*   `-a`: Stage all tracked files (`git add .`) before generating the message.
+*   `-p`: Push changes to the remote repository after a successful commit.
 *   `-y`: (YOLO mode) Skip the interactive confirmation and commit directly.
-*   `-h`, `--help`: Show the help message.
+*   `-h`: Show the help message.
 
 ### Examples
 

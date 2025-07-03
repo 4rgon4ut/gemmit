@@ -7,30 +7,37 @@ ADD=false
 PUSH=false
 CONFIRM=true
 TEMPLATE=""
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
-        -a|--add) ADD=true; shift ;;
-        -p|--push) PUSH=true; shift ;;
-        -y) CONFIRM=false; shift ;;
-        -h|--help)
-            echo "Usage: gemmit [-a|--add] [-p|--push] [-y] <template>"
-            echo "       gemmit [-h|--help]"
-            exit 0
-            ;;
-        *)
-            if [ -z "$TEMPLATE" ]; then
-                TEMPLATE=$1
-                shift
-            else
-                echo "Unknown option: $1"
-                exit 1
-            fi
-            ;;
-    esac
+# Use getopts for robust short option parsing, allowing combination (e.g., -apy).
+while getopts ":apyh" opt; do
+  case ${opt} in
+    a ) ADD=true ;;
+    p ) PUSH=true ;;
+    y ) CONFIRM=false ;;
+    h )
+      echo "Usage: gemmit [-apyh] <template>"
+      echo "  -a: Stage all tracked files."
+      echo "  -p: Push after commit."
+      echo "  -y: Skip confirmation (YOLO mode)."
+      echo "  -h: Show this help message."
+      exit 0
+      ;;
+    \? )
+      echo "Invalid Option: -$OPTARG" 1>&2
+      exit 1
+      ;;
+  esac
 done
+shift $((OPTIND -1))
+
+# The first non-option argument is the template.
+if [ -z "$1" ]; then
+    echo "Usage: gemmit [-apyh] <template>"
+    exit 1
+fi
+TEMPLATE=$1
 
 if [ -z "$TEMPLATE" ]; then
-    echo "Usage: gemmit [-a|--add] [-p|--push] [-y] <template>"
+    echo "Usage: gemmit [-apyh] <template>"
     exit 1
 fi
 
