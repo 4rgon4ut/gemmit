@@ -23,7 +23,10 @@ def generate_commit_message(prompt):
                 text=True,
                 check=True
             )
-            return process.stdout.strip()
+            # Filter out unwanted lines from the output.
+            lines = process.stdout.strip().split('\n')
+            filtered_lines = [line for line in lines if not line.strip().startswith("MCP STDERR")]
+            return '\n'.join(filtered_lines)
         except subprocess.CalledProcessError as e:
             if "429" in e.stderr or "Quota exceeded" in e.stderr:
                 if i < max_retries - 1:
