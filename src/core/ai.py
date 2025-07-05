@@ -25,9 +25,14 @@ def generate_commit_message(prompt):
             )
             # Filter out unwanted lines from the output.
             lines = process.stdout.strip().split('\n')
-            filtered_lines = [line for line in lines if not line.strip().startswith("MCP STDERR")]
+            filtered_lines = [line for line in lines if not line.strip().startswith("MCP")]
             return '\n'.join(filtered_lines)
         except subprocess.CalledProcessError as e:
+            # Filter out MCP lines from stderr
+            stderr_lines = e.stderr.strip().split('\n')
+            filtered_stderr_lines = [line for line in stderr_lines if not line.strip().startswith("MCP")]
+            filtered_stderr = '\n'.join(filtered_stderr_lines)
+
             if "429" in e.stderr or "Quota exceeded" in e.stderr:
                 if i < max_retries - 1:
                     print(
@@ -36,9 +41,19 @@ def generate_commit_message(prompt):
                     )
                     time.sleep(retry_delay)
                 else:
-                    handle_error("API quota exceeded after maximum retries.", e.stderr)
+                    handle_error("API quota exceeded after maximum retries.", filtered_stderr)
+            elif not filtered_stderr.strip():
+                # Stderr only contained MCP lines, so we can treat it as a success.
+                # Filter stdout from the exception and return it.
+                stdout_lines = e.stdout.strip().split('\n')
+                filtered_stdout_lines = [line for line in stdout_lines if not line.strip().startswith("MCP")]
+                commit_message = '\n'.join(filtered_stdout_lines)
+                if commit_message.strip():
+                    return commit_message
+                else:
+                    handle_error("Command failed with only MCP errors, but produced no output on stdout.")
             else:
-                handle_error("An unexpected error occurred while calling the Gemini CLI.", e.stderr)
+                handle_error("An unexpected error occurred while calling the Gemini CLI.", filtered_stderr)
         except FileNotFoundError:
             handle_error("'gemini' command not found. Make sure it is installed and in your PATH.")
 

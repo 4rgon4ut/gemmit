@@ -37,6 +37,19 @@ def test_generate_commit_message_success(mock_run, mock_which):
 
 @patch('shutil.which', return_value='/usr/local/bin/gemini')
 @patch('subprocess.run')
+def test_generate_commit_message_filters_mcp_lines(mock_run, mock_which):
+    """Tests that MCP lines are filtered from the output."""
+    mock_run.return_value = MagicMock(
+        stdout="MCP STDOUT: some debug info\nfeat: A new feature\nMCP STDOUT: more info",
+        stderr="MCP STDERR: some error\nAnother error",
+        returncode=0
+    )
+
+    message = ai.generate_commit_message("a prompt")
+    assert message == "feat: A new feature"
+
+@patch('shutil.which', return_value='/usr/local/bin/gemini')
+@patch('subprocess.run')
 def test_generate_commit_message_retry_then_succeed(mock_run, mock_which):
     """Tests that the retry logic works on quota errors."""
     # Simulate a quota error, then a success
