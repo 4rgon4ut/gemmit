@@ -79,3 +79,5 @@ def test_generate_commit_message_gemini_not_found(mock_which):
     """Tests that the function exits if the gemini CLI is not found."""
     with pytest.raises(SystemExit):
         ai.generate_commit_message("some prompt")
+
+

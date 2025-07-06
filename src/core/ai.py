@@ -6,6 +6,7 @@ import time
 import sys
 from utils.errors import handle_error
 
+# This is a trivial comment to allow a new commit.
 def generate_commit_message(prompt):
     """Generates a commit message from a prompt, with retries for quota errors."""
     if not shutil.which('gemini'):
@@ -25,12 +26,13 @@ def generate_commit_message(prompt):
             )
             # Filter out unwanted lines from the output.
             lines = process.stdout.strip().split('\n')
-            filtered_lines = [line for line in lines if not line.strip().startswith("MCP")]
+            filtered_lines = [line for line in lines if "MCP" not in line.strip()]
             return '\n'.join(filtered_lines)
         except subprocess.CalledProcessError as e:
-            # Filter out MCP lines from stderr
+                        # Filter out informational MCP lines from stderr, but preserve MCPERR.
             stderr_lines = e.stderr.strip().split('\n')
-            filtered_stderr_lines = [line for line in stderr_lines if not line.strip().startswith("MCP")]
+            filtered_stderr_lines = [line for line in stderr_lines if not line.strip().startswith("MCP") or line.strip().startswith("MCPERR")]
+
             filtered_stderr = '\n'.join(filtered_stderr_lines)
 
             if "429" in e.stderr or "Quota exceeded" in e.stderr:
@@ -46,7 +48,7 @@ def generate_commit_message(prompt):
                 # Stderr only contained MCP lines, so we can treat it as a success.
                 # Filter stdout from the exception and return it.
                 stdout_lines = e.stdout.strip().split('\n')
-                filtered_stdout_lines = [line for line in stdout_lines if not line.strip().startswith("MCP")]
+                filtered_stdout_lines = [line for line in stdout_lines if "MCP" not in line.strip()]
                 commit_message = '\n'.join(filtered_stdout_lines)
                 if commit_message.strip():
                     return commit_message
