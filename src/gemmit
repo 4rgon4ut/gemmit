@@ -127,5 +127,6 @@ if $PUSH; then
     else
         echo -e "${COLOR}Pushing changes...${NC}"
     fi
-    git push
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    git push origin $CURRENT_BRANCH
 fi
