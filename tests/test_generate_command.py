@@ -41,4 +41,4 @@ def test_run_no_staged_changes(mock_get_diff, mock_get_template):
 def test_run_no_template_specified(mock_handle_error):
     """Tests that the command calls the error handler if no template is given."""
     generate.run([]) # No arguments
-    mock_handle_error.assert_called_once_with("No template specified.", "Usage: gemmit add <template>")
+    mock_handle_error.assert_called_once_with("No template specified and no default template set.", "Usage: gemmit add <template> or gemmit --set-default <template>")

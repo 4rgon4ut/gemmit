@@ -4,35 +4,29 @@
 
 # The directory where gemmit will be installed.
 INSTALL_DIR="$HOME/.gemmit"
-CONFIG_FILE="$INSTALL_DIR/config.json"
-SCRIPT_FILE="$INSTALL_DIR/gemmit.py"
-GEMMIT_FILE="$INSTALL_DIR/gemmit"
 
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/src"
 
 # Create the installation directory if it doesn't exist.
 mkdir -p "$INSTALL_DIR"
 
-# Copy the config file and the scripts.
-cp "$SOURCE_DIR/config.json" "$CONFIG_FILE"
-cp "$SOURCE_DIR/gemmit.py" "$SCRIPT_FILE"
-cp "$SOURCE_DIR/gemmit" "$GEMMIT_FILE"
+# Remove old cache files
+find "$INSTALL_DIR" -type d -name "__pycache__" -exec rm -r {} +
 
-# Copy the new directories
-cp -r "$SOURCE_DIR/commands" "$INSTALL_DIR/commands"
-cp -r "$SOURCE_DIR/core" "$INSTALL_DIR/core"
-cp -r "$SOURCE_DIR/utils" "$INSTALL_DIR/utils"
+# Copy the application files.
+cp -r "$SOURCE_DIR/"* "$INSTALL_DIR/"
 
+# Create __init__.py files to make directories importable
+find "$INSTALL_DIR" -type d -exec touch {}/__init__.py \; 
 
-# Make the scripts executable.
-chmod +x "$SCRIPT_FILE"
-chmod +x "$GEMMIT_FILE"
-
+# Make the main script executable.
+chmod +x "$INSTALL_DIR/gemmit"
 
 echo "gemmit installed successfully!"
 echo ""
 echo "To use it, add the following line to your shell profile (e.g., ~/.bashrc, ~/.zshrc):"
 echo "export PATH=\"$INSTALL_DIR:\$PATH\""
+echo "export PYTHONPATH=\"$INSTALL_DIR:\$PYTHONPATH\""
 
 echo ""
 echo "To uninstall gemmit, run:"

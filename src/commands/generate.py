@@ -2,17 +2,21 @@
 
 import sys
 from core.ai import generate_commit_message
-from core.config import get_template
+from core.config import get_template, load_config
 from core.git import get_staged_diff
 from utils.errors import handle_error
 
 def run(args):
     """Generates a commit message and prints it to stdout."""
     if not args:
-        handle_error("No template specified.", "Usage: gemmit add <template>")
-        return
+        config = load_config()
+        template_name = config.get('default_template')
+        if not template_name:
+            handle_error("No template specified and no default template set.", "Usage: gemmit add <template> or gemmit --set-default <template>")
+            return
+    else:
+        template_name = args[0]
 
-    template_name = args[0]
     template = get_template(template_name)
     diff = get_staged_diff()
 

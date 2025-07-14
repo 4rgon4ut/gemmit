@@ -4,9 +4,15 @@ import subprocess
 from utils.errors import handle_error
 
 def get_staged_diff():
-    """Gets the staged git diff."""
+    """Gets the staged diff from git."""
     try:
-        # --cached gets the diff of staged changes.
-        return subprocess.check_output(['git', 'diff', '--cached']).decode('utf-8')
+        return subprocess.check_output(['git', 'diff', '--cached'], text=True)
     except subprocess.CalledProcessError as e:
-        handle_error("getting git diff", e)
+        handle_error("getting staged diff", e)
+
+def stage_all_files():
+    """Stages all tracked files in the repository."""
+    try:
+        subprocess.run(['git', 'add', '.'], check=True)
+    except subprocess.CalledProcessError as e:
+        handle_error("staging all files", e)
