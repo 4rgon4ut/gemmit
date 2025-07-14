@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+import subprocess
 from core.ai import generate_commit_message
 from core.config import get_template, set_default_template, load_config
 from core.git import get_staged_diff, stage_all_files
@@ -30,6 +31,16 @@ def main():
         '-a', '--add',
         action='store_true',
         help='Stage all tracked files before committing.'
+    )
+    parser.add_argument(
+        '-p', '--push',
+        action='store_true',
+        help='Push after committing.'
+    )
+    parser.add_argument(
+        '-y', '--yes',
+        action='store_true',
+        help='Skip confirmation prompt.'
     )
 
     args = parser.parse_args()
@@ -60,8 +71,26 @@ def main():
     prompt = template.get('prompt', '') + '\n\n' + diff
     commit_message = generate_commit_message(prompt)
 
-    # Print the commit message to stdout for the calling script.
-    print(commit_message)
+    if not args.yes and sys.stdout.isatty():
+        print("--- Generated Commit Message ---")
+        print(commit_message)
+        print("--------------------------------")
+        answer = input("Use this message? [Y/n] ")
+        if answer.lower() not in ['y', 'yes', '']:
+            print("Commit aborted by user.")
+            sys.exit(1)
+
+    try:
+        subprocess.run(['git', 'commit', '-m', commit_message], check=True)
+    except subprocess.CalledProcessError as e:
+        handle_error("committing changes", e)
+
+    if args.push:
+        try:
+            print("Pushing changes...")
+            subprocess.run(['git', 'push'], check=True)
+        except subprocess.CalledProcessError as e:
+            handle_error("pushing changes", e)
 
 if __name__ == '__main__':
     main()
