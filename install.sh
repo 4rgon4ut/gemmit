@@ -5,7 +5,7 @@
 # The directory where gemmit will be installed.
 INSTALL_DIR="$HOME/.gemmit"
 
-SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/src"
+SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create the installation directory if it doesn't exist.
 mkdir -p "$INSTALL_DIR"
@@ -14,10 +14,15 @@ mkdir -p "$INSTALL_DIR"
 find "$INSTALL_DIR" -type d -name "__pycache__" -exec rm -r {} +
 
 # Copy the application files.
-cp -r "$SOURCE_DIR/"* "$INSTALL_DIR/"
+cp -r "$SOURCE_DIR/src/"* "$INSTALL_DIR/"
 
 # Create __init__.py files to make directories importable
-find "$INSTALL_DIR" -type d -exec touch {}/__init__.py \; 
+find "$INSTALL_DIR" -type d -exec touch {}/__init__.py \;
+
+# Install dependencies
+if [ -f "$SOURCE_DIR/requirements.txt" ]; then
+    pip install --target="$INSTALL_DIR" -r "$SOURCE_DIR/requirements.txt"
+fi
 
 # Make the main script executable.
 chmod +x "$INSTALL_DIR/gemmit"
