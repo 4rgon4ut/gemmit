@@ -42,7 +42,7 @@ def run(args):
         highlight_color = config.get("highlight_color", "green")
 
         console.print(f"[{highlight_color}]--- Generated Commit Message ---[/{highlight_color}]")
-        console.print(commit_message)
+        console.print(f"[{highlight_color}]{commit_message}[/{highlight_color}]")
         console.print(f"[{highlight_color}]--------------------------------[/{highlight_color}]")
 
         answer = console.input("Use this message? [Y]es, [E]dit, [R]egenerate, [N]o: ").lower()

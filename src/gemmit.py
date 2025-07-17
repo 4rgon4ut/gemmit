@@ -5,7 +5,7 @@ import sys
 import subprocess
 from commands.generate import run as generate_run
 from core.config import get_template, set_default_template, load_config
-from core.git import get_staged_diff, stage_all_files
+from core.git import get_staged_diff, stage_all_files, get_current_branch, get_remote_url
 from utils.errors import handle_error
 from core.ai import generate_commit_message
 
@@ -82,12 +82,17 @@ def main():
 
         if args.push:
             try:
+                branch = get_current_branch()
+                remote_url = get_remote_url()
                 config = load_config()
                 highlight_color = config.get("highlight_color", "green")
                 from rich.console import Console
                 console = Console()
-                console.print(f"[{highlight_color}]Pushing changes...[/{highlight_color}]")
-                subprocess.run(["git", "push"], check=True)
+                if remote_url:
+                    console.print(f"[{highlight_color}]Pushing to {remote_url}...[/{highlight_color}]")
+                else:
+                    console.print(f"[{highlight_color}]Pushing changes...[/{highlight_color}]")
+                subprocess.run(["git", "push", "-u", "origin", branch], check=True)
             except subprocess.CalledProcessError as e:
                 handle_error("pushing changes", e)
 
