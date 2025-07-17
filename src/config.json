@@ -1,6 +1,7 @@
 {
   "autoconfirm": false,
   "highlight_color": "#FFA500",
+  "default_template": "kernel",
   "templates": {
     "oneline": {
       "prompt": "Analyze the following git diff and generate a concise, semantic commit message in the format: type(scope): message. The message should be descriptive and under 50 characters. The available types are: feat, fix, docs, style, refactor, test, chore. The scope should indicate the area of the codebase affected.",

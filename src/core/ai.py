@@ -26,7 +26,7 @@ def generate_commit_message(prompt):
             )
             # Filter out unwanted lines from the output.
             lines = process.stdout.strip().split('\n')
-            filtered_lines = [line for line in lines if "MCP" not in line.strip()]
+            filtered_lines = [line for line in lines if "MCP" not in line.strip() and line.strip()]
             return '\n'.join(filtered_lines)
         except subprocess.CalledProcessError as e:
                         # Filter out informational MCP lines from stderr, but preserve MCPERR.
@@ -48,7 +48,7 @@ def generate_commit_message(prompt):
                 # Stderr only contained MCP lines, so we can treat it as a success.
                 # Filter stdout from the exception and return it.
                 stdout_lines = e.stdout.strip().split('\n')
-                filtered_stdout_lines = [line for line in stdout_lines if "MCP" not in line.strip()]
+                filtered_stdout_lines = [line for line in stdout_lines if "MCP" not in line.strip() and line.strip()]
                 commit_message = '\n'.join(filtered_stdout_lines)
                 if commit_message.strip():
                     return commit_message
