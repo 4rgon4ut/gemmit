@@ -11,4 +11,5 @@
       "prompt": "Analyze the following git diff and generate a detailed commit message in the Linux kernel style. The first line should be a short summary (under 50 characters). The body of the commit message should follow this structure, with blank lines separating each section:\n- A brief explanation of the main change and why it's necessary.\n- A bulleted list detailing the specific changes made.\n- A section for any side effects, breaking changes, or other relevant information. Only include sections if they are relevant. Do not include any personal information, such as email addresses, in the commit message. Only include the author's nickname if necessary.",
       "template": "{summary}\n\n{motivation}\n\n{changes}\n\n{side_effects_and_additional_info}"
     }
+  }
 }
