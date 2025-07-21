@@ -1,14 +1,15 @@
 {
   "autoconfirm": false,
   "highlight_color": "#FFA500",
+  "default_template": "kernel",
   "templates": {
     "oneline": {
       "prompt": "Analyze the following git diff and generate a concise, semantic commit message in the format: type(scope): message. The message should be descriptive and under 50 characters. The available types are: feat, fix, docs, style, refactor, test, chore. The scope should indicate the area of the codebase affected.",
       "template": "{type}({scope}): {message}"
     },
     "kernel": {
-      "prompt": "Analyze the following git diff and generate a detailed commit message in the Linux kernel style. The first line should be a short summary (under 50 characters). The following lines should provide a more detailed explanation of the changes, including the problem being solved and the approach taken. Do not include any personal information, such as email addresses, in the commit message. Only include the author's nickname if necessary.",
-      "template": "{summary}\n\n{description}"
+      "prompt": "Analyze the following git diff and generate a detailed commit message in the Linux kernel style. The first line should be a short summary (under 50 characters). The body of the commit message should follow this structure, with blank lines separating each section:\n1. **Motivation**: A brief explanation of the main change and why it's necessary.\n2. **Changes**: A bulleted list detailing the specific changes made.\n3. **Side Effects and Additional Info**: A section for any side effects, breaking changes, or other relevant information. Do not include any personal information, such as email addresses, in the commit message. Only include the author's nickname if necessary.",
+      "template": "{summary}\n\n{motivation}\n\n{changes}\n\n{side_effects_and_additional_info}"
     }
   }
 }
