@@ -5,8 +5,6 @@ import subprocess
 import tempfile
 import os
 from rich.console import Console
-from rich.panel import Panel
-from rich.syntax import Syntax
 
 from core.ai import generate_commit_message
 from core.config import get_template, load_config

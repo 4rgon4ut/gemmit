@@ -21,7 +21,7 @@ def get_remote_url():
     """Gets the URL of the remote repository."""
     try:
         return subprocess.check_output(['git', 'remote', 'get-url', 'origin']).decode().strip()
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError:
         # If the remote doesn't exist, return an empty string
         return ""
 

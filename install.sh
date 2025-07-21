@@ -7,11 +7,14 @@ INSTALL_DIR="$HOME/.gemmit"
 
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Create the installation directory if it doesn't exist.
-mkdir -p "$INSTALL_DIR"
+# Remove the existing installation directory if it exists.
+if [ -d "$INSTALL_DIR" ]; then
+    echo "Removing existing gemmit installation..."
+    rm -rf "$INSTALL_DIR"
+fi
 
-# Remove old cache files
-find "$INSTALL_DIR" -type d -name "__pycache__" -exec rm -r {} +
+# Create the installation directory.
+mkdir -p "$INSTALL_DIR"
 
 # Copy the application files.
 cp -r "$SOURCE_DIR/src/"* "$INSTALL_DIR/"
