@@ -3,16 +3,18 @@ import pytest
 from unittest.mock import patch, MagicMock
 from commands import generate
 
+@patch('commands.generate.load_config')
 @patch('commands.generate.Console')
 @patch('commands.generate.get_template')
 @patch('commands.generate.get_staged_diff')
 @patch('commands.generate.generate_commit_message')
-def test_run_success(mock_generate_commit, mock_get_diff, mock_get_template, mock_console):
+def test_run_success(mock_generate_commit, mock_get_diff, mock_get_template, mock_console, mock_load_config):
     """Tests the successful run of the generate command with user accepting."""
     # Setup mocks
     mock_get_template.return_value = {"prompt": "Test prompt"}
     mock_get_diff.return_value = "diff --git a/file.txt b/file.txt"
     mock_generate_commit.return_value = "feat: This is a test commit"
+    mock_load_config.return_value = {"highlight_color": "blue"}
     
     # Mock the console input to return 'y' for 'yes'
     mock_console_instance = MagicMock()
