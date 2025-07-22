@@ -3,11 +3,11 @@
 import argparse
 import sys
 import subprocess
-from commands.generate import run as generate_run
-from core.config import get_template, set_default_template, load_config
-from core.git import get_staged_diff, stage_all_files, get_current_branch, get_remote_url
-from utils.errors import handle_error
-from core.ai import generate_commit_message
+from .commands.generate import run as generate_run
+from .core.config import get_template, set_default_template, load_config
+from .core.git import get_staged_diff, stage_all_files, get_current_branch, get_remote_url
+from .utils.errors import handle_error
+from .core.ai import generate_commit_message
 
 
 def main():

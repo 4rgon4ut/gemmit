@@ -1,7 +1,7 @@
 
 import pytest
 from unittest.mock import patch, mock_open
-from core import config
+from gemmit.core import config
 
 # A mock of the config.json file content
 MOCK_CONFIG_CONTENT = '''

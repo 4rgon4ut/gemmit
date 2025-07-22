@@ -6,10 +6,10 @@ import tempfile
 import os
 from rich.console import Console
 
-from core.ai import generate_commit_message
-from core.config import get_template, load_config
-from core.git import get_staged_diff
-from utils.errors import handle_error
+from ..core.ai import generate_commit_message
+from ..core.config import get_template, load_config
+from ..core.git import get_staged_diff
+from ..utils.errors import handle_error
 
 def run(args):
     """Generates a commit message and provides options to accept, edit, or regenerate."""

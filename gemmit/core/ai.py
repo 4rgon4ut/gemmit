@@ -4,7 +4,7 @@ import subprocess
 import shutil
 import time
 import sys
-from utils.errors import handle_error
+from ..utils.errors import handle_error
 
 # This is a trivial comment to allow a new commit.
 def generate_commit_message(prompt):

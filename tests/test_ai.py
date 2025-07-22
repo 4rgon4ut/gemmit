@@ -2,7 +2,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 import subprocess
-from core import ai
+from gemmit.core import ai
 
 # Successful response from the gemini CLI
 MOCK_SUCCESS_RESPONSE = MagicMock(

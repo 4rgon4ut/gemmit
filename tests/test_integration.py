@@ -3,6 +3,7 @@ import subprocess
 import os
 import json
 import sys
+import shutil
 
 # --- Test Setup and Fixtures ---
 
@@ -32,17 +33,15 @@ def mock_gemmit_home(tmp_path):
     gemmit_home = tmp_path / ".gemmit"
     gemmit_home.mkdir()
 
-    # Install dependencies into the mock home
+    # Install the gemmit package in editable mode
     subprocess.run([
         sys.executable,
         "-m",
         "pip",
         "install",
-        "--target",
-        str(gemmit_home),
-        "-r",
-        "requirements.txt",
-    ], check=True)
+        "-e",
+        ".",
+    ], check=True, cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     
     # Create a mock config.json
     config_data = {
@@ -57,13 +56,6 @@ def mock_gemmit_home(tmp_path):
     gemini_script_path = gemmit_home / "gemini"
     gemini_script_path.write_text('#!/bin/bash\necho "feat: Mocked commit message"\n')
     os.chmod(gemini_script_path, 0o755)
-    
-    # Symlink the real gemmit script into our mock home
-    os.symlink(os.path.abspath("src/gemmit"), gemmit_home / "gemmit")
-    os.symlink(os.path.abspath("src/gemmit.py"), gemmit_home / "gemmit.py")
-    os.symlink(os.path.abspath("src/commands"), gemmit_home / "commands", target_is_directory=True)
-    os.symlink(os.path.abspath("src/core"), gemmit_home / "core", target_is_directory=True)
-    os.symlink(os.path.abspath("src/utils"), gemmit_home / "utils", target_is_directory=True)
 
     
     yield gemmit_home
@@ -86,12 +78,12 @@ def test_end_to_end_commit_autoconfirm(test_repo, mock_gemmit_home):
     subprocess.run(["git", "add", "test.txt"], cwd=test_repo, check=True)
     
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(mock_gemmit_home) + os.pathsep + env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) + os.pathsep + env.get("PYTHONPATH", "")
     env["PATH"] = str(mock_gemmit_home) + os.pathsep + env["PATH"]
     env["HOME"] = str(mock_gemmit_home.parent)
 
-    gemmit_cmd = mock_gemmit_home / "gemmit"
-    os.chmod(gemmit_cmd, 0o755)
+    gemmit_cmd = shutil.which('gemmit')
+    assert gemmit_cmd, "gemmit executable not found in PATH"
     subprocess.run([str(gemmit_cmd), "test", "-y"], cwd=test_repo, check=True, env=env)
     
     result = subprocess.run(["git", "log", "-1", "--pretty=%B"], cwd=test_repo, check=True, capture_output=True, text=True)
@@ -103,7 +95,7 @@ def test_end_to_end_commit_edit(test_repo, mock_gemmit_home):
     subprocess.run(["git", "add", "test.txt"], cwd=test_repo, check=True)
     
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(mock_gemmit_home) + os.pathsep + env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) + os.pathsep + env.get("PYTHONPATH", "")
     env["PATH"] = str(mock_gemmit_home) + os.pathsep + env["PATH"]
     env["HOME"] = str(mock_gemmit_home.parent)
     # Create a mock editor script
@@ -119,8 +111,8 @@ with open(file_path, 'w') as f:
 """)
     env["EDITOR"] = f"python3 {editor_script_path}"
 
-    gemmit_cmd = mock_gemmit_home / "gemmit"
-    os.chmod(gemmit_cmd, 0o755)
+    gemmit_cmd = shutil.which('gemmit')
+    assert gemmit_cmd, "gemmit executable not found in PATH"
     
     # We pipe 'e' for edit into the script's stdin
     subprocess.run([str(gemmit_cmd), "test"], cwd=test_repo, check=True, env=env, input="e\n", text=True)

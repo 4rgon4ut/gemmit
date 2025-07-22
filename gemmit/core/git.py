@@ -1,7 +1,7 @@
 # This module contains helper functions for interacting with Git.
 
 import subprocess
-from utils.errors import handle_error
+from ..utils.errors import handle_error
 
 def get_staged_diff():
     """Gets the staged diff from git."""

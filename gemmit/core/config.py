@@ -2,12 +2,19 @@
 
 import json
 import os
-from utils.errors import handle_error
+from ..utils.errors import handle_error
 
 CONFIG_FILE = os.path.expanduser('~/.gemmit/config.json')
 
 def load_config():
-    """Loads the configuration file."""
+    """Loads the configuration file, creating it if it doesn't exist."""
+    if not os.path.exists(CONFIG_FILE):
+        print(f"Configuration file not found at {CONFIG_FILE}. Creating a default one.")
+        os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
+        default_config_path = os.path.join(os.path.dirname(__file__), '..', 'config.json')
+        with open(default_config_path, 'r') as src, open(CONFIG_FILE, 'w') as dest:
+            dest.write(src.read())
+
     try:
         with open(CONFIG_FILE, 'r') as f:
             return json.load(f)

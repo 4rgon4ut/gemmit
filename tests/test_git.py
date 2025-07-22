@@ -2,7 +2,7 @@
 import pytest
 from unittest.mock import patch
 import subprocess
-from core import git
+from gemmit.core import git
 
 @patch('subprocess.check_output')
 def test_get_staged_diff_success(mock_check_output):
