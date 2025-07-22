@@ -10,9 +10,9 @@ A command-line tool that uses the [gemini-cli](https://github.com/google-gemini/
     cd gemmit
     ```
 
-2.  **Run the installer:**
+2.  **Install:**
     ```bash
-    ./install.sh
+     pip install .
     ```
 
 3.  **Update your shell profile:**
