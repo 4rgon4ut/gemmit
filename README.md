@@ -57,11 +57,24 @@ By default, `gemmit` runs in an interactive mode that allows you to review, edit
 
 ```
 --- Generated Commit Message ---
-feat: Add interactive editing to gemmit
+feat: Add interactive commit message workflow
 
-This commit introduces a new interactive mode to the gemmit tool.
-Users can now review, edit, or regenerate the AI-generated commit
-message before it is committed.
+The previous implementation was a simple, one-shot operation that
+generated a commit message, leaving the user to either accept it
+as-is or abort.
+This patch introduces a new interactive workflow for commit message
+generation, providing a more powerful and user-friendly experience.
+
+The key changes are:
+- The `generate` command now enters an interactive loop after creating
+  the first message.
+- Four options are provided:
+  - [Y]es: Accept the message and proceed with the commit.
+  - [E]dit: Open the message in the default system editor ($EDITOR)
+    for manual changes.
+  - [R]egenerate: Discard the current message and generate a new one.
+  - [N]o: Abort the commit process.
+- The main script invokes this interactive mode by default.
 --------------------------------
 Use this message? [Y]es, [E]dit, [R]egenerate, [N]o:
 ```
