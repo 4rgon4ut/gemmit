@@ -43,8 +43,12 @@ def test_get_template_not_found(mock_file):
         config.get_template("nonexistent")
 
 
+@patch("os.path.exists", return_value=True)
 @patch("builtins.open", side_effect=FileNotFoundError)
-def test_load_config_file_not_found(mock_file):
-    """Tests that a missing config file raises an error."""
+def test_load_config_file_not_found(mock_open, mock_exists):
+    """
+    Tests that an error is raised if the config file is supposed to exist
+    but cannot be opened.
+    """
     with pytest.raises(SystemExit):
         config.load_config()
