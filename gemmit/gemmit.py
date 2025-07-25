@@ -5,7 +5,12 @@ import sys
 import subprocess
 from .commands.generate import run as generate_run
 from .core.config import get_template, set_default_template, load_config
-from .core.git import get_staged_diff, stage_all_files, get_current_branch, get_remote_url
+from .core.git import (
+    get_staged_diff,
+    stage_all_files,
+    get_current_branch,
+    get_remote_url,
+)
 from .utils.errors import handle_error
 from .core.ai import generate_commit_message
 
@@ -72,7 +77,10 @@ def main():
         prompt = template.get("prompt", "") + "\n\n" + diff
         commit_message = generate_commit_message(prompt)
     else:
-        commit_message = generate_run(unknown_args + ([template_name] if template_name and not unknown_args else []))
+        commit_message = generate_run(
+            unknown_args
+            + ([template_name] if template_name and not unknown_args else [])
+        )
 
     if commit_message:
         try:
@@ -87,11 +95,16 @@ def main():
                 config = load_config()
                 highlight_color = config.get("highlight_color", "green")
                 from rich.console import Console
+
                 console = Console()
                 if remote_url:
-                    console.print(f"[{highlight_color}]Pushing to {remote_url}...[/{highlight_color}]")
+                    console.print(
+                        f"[{highlight_color}]Pushing to {remote_url}...[/{highlight_color}]"
+                    )
                 else:
-                    console.print(f"[{highlight_color}]Pushing changes...[/{highlight_color}]")
+                    console.print(
+                        f"[{highlight_color}]Pushing changes...[/{highlight_color}]"
+                    )
                 subprocess.run(["git", "push", "-u", "origin", branch], check=True)
             except subprocess.CalledProcessError as e:
                 handle_error("pushing changes", e)
@@ -99,4 +112,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

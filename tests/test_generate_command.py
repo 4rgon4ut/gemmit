@@ -2,19 +2,26 @@ import pytest
 from unittest.mock import patch, MagicMock
 from gemmit.commands import generate
 
-@patch('gemmit.commands.generate.load_config')
-@patch('gemmit.commands.generate.Console')
-@patch('gemmit.commands.generate.get_template')
-@patch('gemmit.commands.generate.get_staged_diff')
-@patch('gemmit.commands.generate.generate_commit_message')
-def test_run_success(mock_generate_commit, mock_get_diff, mock_get_template, mock_console, mock_load_config):
+
+@patch("gemmit.commands.generate.load_config")
+@patch("gemmit.commands.generate.Console")
+@patch("gemmit.commands.generate.get_template")
+@patch("gemmit.commands.generate.get_staged_diff")
+@patch("gemmit.commands.generate.generate_commit_message")
+def test_run_success(
+    mock_generate_commit,
+    mock_get_diff,
+    mock_get_template,
+    mock_console,
+    mock_load_config,
+):
     """Tests the successful run of the generate command with user accepting."""
     # Setup mocks
     mock_get_template.return_value = {"prompt": "Test prompt"}
     mock_get_diff.return_value = "diff --git a/file.txt b/file.txt"
     mock_generate_commit.return_value = "feat: This is a test commit"
     mock_load_config.return_value = {"highlight_color": "blue"}
-    
+
     # Mock the console input to return 'y' for 'yes'
     mock_console_instance = MagicMock()
     mock_console_instance.input.return_value = "y"
@@ -29,11 +36,13 @@ def test_run_success(mock_generate_commit, mock_get_diff, mock_get_template, moc
     mock_get_diff.assert_called_once()
     expected_prompt = "Test prompt\n\ndiff --git a/file.txt b/file.txt"
     mock_generate_commit.assert_called_once_with(expected_prompt)
-    mock_console_instance.input.assert_called_once_with("Use this message? [Y]es, [E]dit, [R]egenerate, [N]o: ")
+    mock_console_instance.input.assert_called_once_with(
+        "Use this message? [Y]es, [E]dit, [R]egenerate, [N]o: "
+    )
 
 
-@patch('gemmit.commands.generate.get_template')
-@patch('gemmit.commands.generate.get_staged_diff')
+@patch("gemmit.commands.generate.get_template")
+@patch("gemmit.commands.generate.get_staged_diff")
 def test_run_no_staged_changes(mock_get_diff, mock_get_template):
     """Tests that the command exits gracefully if there are no staged changes."""
     # Setup mocks
@@ -42,13 +51,17 @@ def test_run_no_staged_changes(mock_get_diff, mock_get_template):
 
     with pytest.raises(SystemExit) as e:
         generate.run(["my-template"])
-    
-    assert e.value.code == 0 # Should exit successfully
 
-@patch('gemmit.commands.generate.load_config')
-@patch('gemmit.commands.generate.handle_error')
+    assert e.value.code == 0  # Should exit successfully
+
+
+@patch("gemmit.commands.generate.load_config")
+@patch("gemmit.commands.generate.handle_error")
 def test_run_no_template_specified(mock_handle_error, mock_load_config):
     """Tests that the command calls the error handler if no template is given."""
     mock_load_config.return_value = {}
-    generate.run([]) # No arguments
-    mock_handle_error.assert_called_once_with("No template specified and no default template set.", "Usage: gemmit add <template> or gemmit --set-default <template>")
+    generate.run([])  # No arguments
+    mock_handle_error.assert_called_once_with(
+        "No template specified and no default template set.",
+        "Usage: gemmit add <template> or gemmit --set-default <template>",
+    )

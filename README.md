@@ -4,20 +4,23 @@ A command-line tool that uses the [gemini-cli](https://github.com/google-gemini/
 
 ## Installation
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
+
     ```bash
     git clone https://github.com/your-username/gemmit.git
     cd gemmit
     ```
 
-2.  **Install:**
+2. **Install:**
+
     ```bash
      pip install .
     ```
 
-3.  **Update your shell profile:**
+3. **Update your shell profile:**
 
     Add the following line to your `~/.bashrc`, `~/.zshrc`, or other shell profile:
+
     ```bash
     export PATH="$HOME/.gemmit:$PATH"
     ```
@@ -32,12 +35,14 @@ gemmit [options] <template>
 
 To remove `gemmit` and its configuration from your system, follow these steps:
 
-1.  **Uninstall the package:**
+1. **Uninstall the package:**
+
     ```bash
     pip uninstall gemmit
     ```
 
-2.  **Remove the configuration directory:**
+2. **Remove the configuration directory:**
+
     ```bash
     rm -rf ~/.gemmit
     ```
@@ -61,10 +66,10 @@ message before it is committed.
 Use this message? [Y]es, [E]dit, [R]egenerate, [N]o:
 ```
 
-*   **[Y]es:** Accepts the message and commits.
-*   **[E]dit:** Opens the message in your default text editor for manual changes.
-*   **[R]egenerate:** Generates a new message using the same template.
-*   **[N]o:** Aborts the commit.
+* **[Y]es:** Accepts the message and commits.
+* **[E]dit:** Opens the message in your default text editor for manual changes.
+* **[R]egenerate:** Generates a new message using the same template.
+* **[N]o:** Aborts the commit.
 
 **Note:** The "Edit" feature relies on the `$EDITOR` environment variable. Make sure it is configured in your shell profile (e.g., `export EDITOR=vim`). If it's not set, it will default to `vim`.
 
@@ -72,10 +77,10 @@ Use this message? [Y]es, [E]dit, [R]egenerate, [N]o:
 
 Flags can be combined (e.g., `-apy`).
 
-*   `-a`: Stage all tracked files (`git add .`) before generating the message.
-*   `-p`: Push changes to the remote repository after a successful commit.
-*   `-y`: (YOLO mode) Skip the interactive confirmation and commit directly.
-*   `-h`: Show the help message.
+* `-a`: Stage all tracked files (`git add .`) before generating the message.
+* `-p`: Push changes to the remote repository after a successful commit.
+* `-y`: (YOLO mode) Skip the interactive confirmation and commit directly.
+* `-h`: Show the help message.
 
 ### Examples
 
@@ -110,7 +115,7 @@ If you omit the `<template>` argument, `gemmit` will use the `default_template` 
 
 You can customize templates and behavior by editing `~/.gemmit/config.json`.
 
-*   **`templates`**: Define your own templates with custom prompts.
-*   **`default_template`**: Set the template to be used by default when no template is specified.
-*   **`autoconfirm`**: Set to `true` to make the `-y` flag the default behavior.
-*   **`highlight_color`**: Set a hex color code (e.g., `#FFA500`) for `gemmit`'s output.
+* **`templates`**: Define your own templates with custom prompts.
+* **`default_template`**: Set the template to be used by default when no template is specified.
+* **`autoconfirm`**: Set to `true` to make the `-y` flag the default behavior.
+* **`highlight_color`**: Set a hex color code (e.g., `#FFA500`) for `gemmit`'s output.

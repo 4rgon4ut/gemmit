@@ -1,10 +1,9 @@
-
 import pytest
 from unittest.mock import patch, mock_open
 from gemmit.core import config
 
 # A mock of the config.json file content
-MOCK_CONFIG_CONTENT = '''
+MOCK_CONFIG_CONTENT = """
 {
     "autoconfirm": false,
     "templates": {
@@ -16,28 +15,35 @@ MOCK_CONFIG_CONTENT = '''
         }
     }
 }
-'''
+"""
 
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_CONFIG_CONTENT)
+
+@patch("builtins.open", new_callable=mock_open, read_data=MOCK_CONFIG_CONTENT)
 def test_load_config(mock_file):
     """Tests that the config is loaded and parsed correctly."""
     cfg = config.load_config()
-    assert cfg['autoconfirm'] is False
-    assert "kernel" in cfg['templates']
+    assert cfg["autoconfirm"] is False
+    assert "kernel" in cfg["templates"]
 
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_CONFIG_CONTENT)
+
+@patch("builtins.open", new_callable=mock_open, read_data=MOCK_CONFIG_CONTENT)
 def test_get_template_success(mock_file):
     """Tests retrieving an existing template."""
-    template = config.get_template('kernel')
-    assert template['prompt'] == "Write a commit message in the style of a Linux kernel commit."
+    template = config.get_template("kernel")
+    assert (
+        template["prompt"]
+        == "Write a commit message in the style of a Linux kernel commit."
+    )
 
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_CONFIG_CONTENT)
+
+@patch("builtins.open", new_callable=mock_open, read_data=MOCK_CONFIG_CONTENT)
 def test_get_template_not_found(mock_file):
     """Tests that a non-existent template raises an error."""
     with pytest.raises(SystemExit):
-        config.get_template('nonexistent')
+        config.get_template("nonexistent")
 
-@patch('builtins.open', side_effect=FileNotFoundError)
+
+@patch("builtins.open", side_effect=FileNotFoundError)
 def test_load_config_file_not_found(mock_file):
     """Tests that a missing config file raises an error."""
     with pytest.raises(SystemExit):

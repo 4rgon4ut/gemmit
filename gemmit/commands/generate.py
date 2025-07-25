@@ -11,13 +11,17 @@ from ..core.config import get_template, load_config
 from ..core.git import get_staged_diff
 from ..utils.errors import handle_error
 
+
 def run(args):
     """Generates a commit message and provides options to accept, edit, or regenerate."""
     if not args:
         config = load_config()
-        template_name = config.get('default_template')
+        template_name = config.get("default_template")
         if not template_name:
-            handle_error("No template specified and no default template set.", "Usage: gemmit add <template> or gemmit --set-default <template>")
+            handle_error(
+                "No template specified and no default template set.",
+                "Usage: gemmit add <template> or gemmit --set-default <template>",
+            )
             return
     else:
         template_name = args[0]
@@ -33,23 +37,31 @@ def run(args):
     commit_message = ""
 
     while True:
-        prompt = template.get('prompt', '') + '\n\n' + diff
+        prompt = template.get("prompt", "") + "\n\n" + diff
         commit_message = generate_commit_message(prompt)
 
         config = load_config()
         highlight_color = config.get("highlight_color", "green")
 
-        console.print(f"[{highlight_color}]--- Generated Commit Message ---[/{highlight_color}]")
-        console.print(f"[{highlight_color}]{commit_message}[/{highlight_color}]")
-        console.print(f"[{highlight_color}]--------------------------------[/{highlight_color}]")
+        console.print(
+            f"[{highlight_color}]--- Generated Commit Message ---[/{highlight_color}]\n"
+        )
+        console.print(f"[{highlight_color}]{commit_message}[/{highlight_color}]\n")
+        console.print(
+            f"[{highlight_color}]--------------------------------[/{highlight_color}]\n"
+        )
 
-        answer = console.input("Use this message? [Y]es, [E]dit, [R]egenerate, [N]o: ").lower()
+        answer = console.input(
+            "Use this message? [Y]es, [E]dit, [R]egenerate, [N]o: "
+        ).lower()
 
         if answer in ["y", "yes", ""]:
             break
         elif answer in ["e", "edit"]:
             editor = os.getenv("EDITOR", "vim")
-            with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix=".md") as tmpfile:
+            with tempfile.NamedTemporaryFile(
+                mode="w+", delete=False, suffix=".md"
+            ) as tmpfile:
                 tmpfile.write(commit_message)
                 tmpfile.flush()
                 subprocess.run(editor.split() + [tmpfile.name])
