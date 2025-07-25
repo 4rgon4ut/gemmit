@@ -91,7 +91,7 @@ Use this message? [Y]es, [E]dit, [R]egenerate, [N]o:
 Flags can be combined (e.g., `-apy`).
 
 * `-a`: Stage all tracked files (`git add .`) before generating the message.
-* `-p`: Push changes to the remote repository after a successful commit.
+* `-p`: Push changes to the remote repository (`origin <branch>`) after a successful commit.
 * `-y`: (YOLO mode) Skip the interactive confirmation and commit directly.
 * `-h`: Show the help message.
 
@@ -114,9 +114,7 @@ gemmit kernel
 An end-to-end workflow: stage all files, generate and confirm the message, and push to the remote repository.
 
 ```bash
-gemmit -a -p kernel
-
-# you can compose flags
+# combined --add --push --yes
 gemmit -apy kernel
 ```
 
