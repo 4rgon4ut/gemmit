@@ -28,6 +28,24 @@ A command-line tool that uses the [gemini-cli](https://github.com/google-gemini/
 gemmit [options] <template>
 ```
 
+## Uninstallation
+
+To remove `gemmit` and its configuration from your system, follow these steps:
+
+1.  **Uninstall the package:**
+    ```bash
+    pip uninstall gemmit
+    ```
+
+2.  **Remove the configuration directory:**
+    ```bash
+    rm -rf ~/.gemmit
+    ```
+
+## Privacy Note
+
+`gemmit` works by sending the output of `git diff --cached` (your staged changes) to the local `gemini-cli` agent to generate a commit message. Be mindful of this when staging sensitive information.
+
 ### Interactive Mode
 
 By default, `gemmit` runs in an interactive mode that allows you to review, edit, or regenerate the commit message before committing.
